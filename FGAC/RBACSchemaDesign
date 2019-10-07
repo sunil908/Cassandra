@@ -1,0 +1,74 @@
+/*
+Design Notes
+===============
+
+ The framework will work upon the general API syntax of CQL. There will be requests processed by "data enforcement monitor" while the micro service submits this  to central processing framework. 
+
+Restful APi with parameters like 
+
+PATH = service URI location/ instance / user token ....
+select?= "SELECT * FROM customer_entity"
+	
+We will have to build a tanslator that will read roles, labels and regenerate the SQL based on the entitlements. For example,
+SELECT lei, mask(name, prefix_4) as name, contact_details FROM customer_entity WHERE lei IN ([23432434],[3423423423],[234234234234]). 
+
+Internally call the RestFUL API with the translated view of the data and pass back the result.
+
+Currently only simple usecase to be considered that doesnt require complex integration of data. In case there is a requirement of complex integration or aggregated data requirements, we will have to build a ETL pipeline that will process in memory the request keeping the data enforcement engine as a layer in the middle. This again will depend on the features available in Hazelcast.
+
+*/
+
+/*
+Table : entitlement_schema_policy
+Description : All tables will be secured using data at schema level. We follow generally least access principle. Therefore any new table added will not be accesible until it is added to 'entitlement_schema_policy'.
+
+entitledPolicyID (generated): A general integer identifier as a sequence number for the row. 
+entitledPolicyDesc (optional): storing the purpose of this description. 
+keyspace (mandatory): this is specific to the cassandra. It will be which keyspace we like to give access.
+
+*/
+
+
+CREATE TABLE entitlement_schema_policy
+	(
+	 entitledSchemaPolicyID int,
+	 entitledPolicyDesc text,
+	 keyspace text,
+	 tableColumnName map<text,text>,
+	 PRIMARY KEY (entitledSchemaPolicyID)
+	);
+
+/* 
+rule condition only supports expression '=', '<=', '>=', '' and contains only columns from the specific table alone
+*/
+CREATE TABLE entitlement_rls_policy
+	(
+	 entitledRLSPolicyID int,
+	 entitledPolicyDesc text,
+	 keyspace text,
+	 tableName set<text>,
+	 ruleCondition <text>
+	 PRIMARY KEY (entitledRLSPolicyID)
+	);
+
+
+CREATE TABLE user_entitle_by_schema_policy
+	(
+	 UserID text, 
+	 entitledPolicyID int,
+	 entitledPolicyDesc text,
+	 keyspace text,
+	 tableColumnName map<text,text>,
+	 PRIMARY KEY ( UserID text, entitledPolicyID )	
+	);
+
+
+CREATE TABLE user_entitle_by_rls_policy
+	(
+	 UserID text,
+	 entitledPolicyID int,
+	 entitledPolicyDesc text,
+	 tableName set<text>,
+	 ruleCondition <text>
+	 PRIMARY KEY (entitledPolicyLabel, entitledPolicyID)
+	);
