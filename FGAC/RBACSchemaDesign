@@ -1,3 +1,56 @@
+
+CREATE KEYSPACE ks_customer WITH REPLICATION {'class':'SimpleStrategy','replication_factor':1};
+
+/* We also should consider possiblity of keys that are composite for entitlement. For example, tomorrow what if we have 
+   composite keys */
+
+CREATE TABLE customer_entity 
+(lei text, 
+ entity text, 
+ entityOwner text, 
+ entityContactDetails map<text, text>,
+ PRIMARY KEY (lei)
+ )
+
+INSERT INTO customer_entity (lei,entity, entityOwner, entityContactDetails ) VALUES ('G20820052','AHHoldings International', 'Andrew Hobson', {'phone':'+61666666666','email':'andrew.h@gcc.com'});
+
+INSERT INTO customer_entity (lei, entity, entityOwner, entityContactDetails ) VALUES ('G24707916','SAN Holdings International', 'Sanjeev Kumar', {'phone':'+617777777','email':'sanjeev.k@ecm.com'});
+
+INSERT INTO customer_entity (lei, entity, entityOwner, entityContactDetails ) VALUES ('G55403998','BATA Groups Public Limited', 'Khanna Anand', {'phone':'+9198765211','email':'anand.kh@bata.com'});
+
+INSERT INTO customer_entity (lei, entity, entityOwner, entityContactDetails ) VALUES ('G43103653','Federer Sports Private Limited', 'Roger Federer', {'phone':'+4487621212','email':'federer.r@fed.com'});
+
+INSERT INTO customer_entity (lei, entity, entityOwner, entityContactDetails ) VALUES ('G43103653','Bulls and Finance Corporation', 'John Pope', {'phone':'+132322134','email':'john.pope@bull.com'});
+
+/* extend this table to further  add the cell level security label. 
+   Currently only the row level security would be enabled
+PoC only will be based on schema and rls. CLS will be looked into later
+Label checking will be at schemaDetails.cellLabel -> lei.cellLabel
+*/
+
+
+CREATE TABLE customer_entity_entitlement
+	(
+	 schemaName <text>,
+	 lei <text>,
+	 /* should contain additional security label at schema level 
+	  { schemaColumnList map<text,text>,
+		schemaKeyColumnList set<text>
+	  }
+	 */
+	 -- Contains the key for which all the labels will be attached as value. We need to figure what about the composite key values
+	 -- In case of composite key value it will be a different approach where key will have to be generate and stored alongside the 
+	 -- schemaDetails map<text text>,
+	 --EntitiledKeyValue map<text,text>
+	 
+	 -- just store the label in this column that will correspond to the lei. This will be used for access control at row level
+	 -- this gives flexiblity to generate labels and add later on the fly. For example, country 'IND' as label.
+	 rlsLabel set<text>, 
+	 clsLabel map<text, text>
+	 PRIMARY KEY (schemaName,lei)
+	);
+
+
 /*
 Design Notes
 ===============
@@ -72,3 +125,5 @@ CREATE TABLE user_entitle_by_rls_policy
 	 ruleCondition <text>
 	 PRIMARY KEY (entitledPolicyLabel, entitledPolicyID)
 	);
+
+
