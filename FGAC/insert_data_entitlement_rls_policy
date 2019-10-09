@@ -1,0 +1,39 @@
+INSERT INTO entitlement_rls_policy(entitledRLSPolicyID , 
+		entitledPolicyDesc, 
+		keyspaceName, 
+		tableName, 
+		ruleCondition)
+	VALUES 
+		(101,
+		'services category access',
+		'ks_customer',
+		'customer_entity',
+		'lei = ''G20820052'' AND lei=''G24707916'''
+		);
+
+		
+INSERT INTO entitlement_rls_policy(entitledRLSPolicyID , 
+		entitledPolicyDesc, 
+		keyspaceName, 
+		tableName, 
+		ruleCondition)
+	VALUES 
+		(102,
+		'user category access',
+		'ks_customer',
+		'customer_entity',
+		'lei = ''G24707916'''
+		);
+		
+INSERT INTO entitlement_rls_policy(entitledRLSPolicyID , 
+		entitledPolicyDesc, 
+		keyspaceName, 
+		tableName, 
+		ruleCondition)
+	VALUES 
+		(103,
+		'user category access',
+		'ks_customer',
+		'customer_entity',
+		'lei = ''G20820052'''
+		);
