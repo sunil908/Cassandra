@@ -63,11 +63,10 @@ CREATE TABLE entitlement_rls_policy(
 		entitledRLSPolicyID int, 
 		entitledPolicyDesc text, 
 		keyspaceName text, 
-		tableName set<text>, 
+		tableName text, 
 		ruleCondition text, 
 		PRIMARY KEY (entitledRLSPolicyID)
 	);
-
 
 CREATE TABLE user_entitle_schema_by_policy
 	(
